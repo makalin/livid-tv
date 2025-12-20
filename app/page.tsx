@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useStore } from '@/store/useStore';
 import RoomJoin from '@/components/RoomJoin';
 import VideoLayer from '@/components/VideoLayer';
@@ -19,6 +20,7 @@ import { useReconnection } from '@/hooks/useReconnection';
 
 export default function Home() {
   const { roomId, isConnected } = useStore();
+  
   useWebRTC(); // Initialize WebRTC connection
   useKeyboardShortcuts(); // Initialize keyboard shortcuts
   useReconnection(); // Handle reconnection logic
@@ -28,7 +30,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-black">
+    <main className="relative w-full h-screen overflow-hidden bg-black" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
       <VideoLayer />
       <CanvasLayer />
       <ChatOverlay />

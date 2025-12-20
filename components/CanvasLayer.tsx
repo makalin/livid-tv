@@ -8,7 +8,7 @@ export default function CanvasLayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPath, setCurrentPath] = useState<{ x: number; y: number }[]>([]);
-  const { strokes, addStroke, setCurrentStroke, drawingTool, widgets } = useStore();
+  const { strokes, addStroke, setCurrentStroke, drawingTool } = useStore();
   const { sendDrawingData } = useWebRTC();
 
   useEffect(() => {
@@ -18,14 +18,21 @@ export default function CanvasLayer() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    // Set canvas size to match viewport
     const resizeCanvas = () => {
+      // Use fixed viewport dimensions to prevent layout shifts
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      // Prevent canvas from affecting layout
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.pointerEvents = 'auto';
     };
 
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    const resizeHandler = () => resizeCanvas();
+    window.addEventListener('resize', resizeHandler);
 
     // Draw all strokes
     const drawStrokes = () => {
@@ -84,26 +91,16 @@ export default function CanvasLayer() {
         ctx.globalCompositeOperation = 'source-over';
       }
 
-      // Draw image widgets
-      widgets
-        .filter((w) => w.type === 'image' && w.imageData)
-        .forEach((widget) => {
-          const img = new Image();
-          img.onload = () => {
-            ctx.drawImage(
-              img,
-              widget.x,
-              widget.y,
-              widget.width || img.width,
-              widget.height || img.height
-            );
-          };
-          img.src = widget.imageData || '';
-        });
+      // Note: Image widgets are rendered separately in ImageOverlay component
+      // Canvas is only for drawing strokes
     };
 
     drawStrokes();
-  }, [strokes, currentPath, widgets]);
+    
+    return () => {
+      window.removeEventListener('resize', resizeHandler);
+    };
+  }, [strokes, currentPath, drawingTool]);
 
   const getCoordinates = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -160,7 +157,15 @@ export default function CanvasLayer() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full z-10 cursor-crosshair"
+      className="fixed inset-0 w-full h-full z-10 cursor-crosshair"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'auto',
+      }}
       onMouseDown={startDrawing}
       onMouseMove={draw}
       onMouseUp={stopDrawing}

@@ -9,17 +9,31 @@ export default function ChatOverlay() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll within the chat container, not the page
+    if (messagesEndRef.current) {
+      const container = messagesEndRef.current.parentElement;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   }, [messages]);
 
   return (
     <div
-      className="absolute top-4 left-4 w-80 max-h-96 z-20 overflow-hidden"
-      style={{ opacity: hudOpacity }}
+      className="fixed top-4 left-4 w-80 max-h-96 z-20 overflow-hidden"
+      style={{ opacity: hudOpacity, position: 'fixed' }}
     >
       <div className="glass-dark rounded-lg p-4 flex flex-col h-full max-h-96">
         <h3 className="text-white text-sm font-semibold mb-2">Chat</h3>
-        <div className="flex-1 overflow-y-auto hide-scrollbar space-y-2 mb-2">
+        <div 
+          className="flex-1 overflow-y-auto hide-scrollbar space-y-2 mb-2"
+          style={{ 
+            maxHeight: 'calc(96px * 4 - 80px)', // Approximate max height
+            overflowY: 'auto',
+            overflowX: 'hidden',
+          }}
+          onScroll={(e) => e.stopPropagation()}
+        >
           <AnimatePresence>
             {messages.map((message) => (
               <motion.div

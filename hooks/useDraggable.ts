@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/store/useStore';
 import { useWebRTC } from '@/hooks/useWebRTC';
 
@@ -90,9 +90,10 @@ export const useDraggable = (widgetId: string) => {
 
     const handleMouseUp = () => {
       if (isDragging) {
-        const updatedWidget = widgets.find((w) => w.id === widgetId);
-        if (updatedWidget) {
-          sendWidget(updatedWidget);
+        // Get current widget state from store
+        const currentWidget = useStore.getState().widgets.find((w) => w.id === widgetId);
+        if (currentWidget) {
+          sendWidget(currentWidget);
         }
         setIsDragging(false);
       }
@@ -100,9 +101,10 @@ export const useDraggable = (widgetId: string) => {
 
     const handleTouchEnd = () => {
       if (isDragging) {
-        const updatedWidget = widgets.find((w) => w.id === widgetId);
-        if (updatedWidget) {
-          sendWidget(updatedWidget);
+        // Get current widget state from store
+        const currentWidget = useStore.getState().widgets.find((w) => w.id === widgetId);
+        if (currentWidget) {
+          sendWidget(currentWidget);
         }
         setIsDragging(false);
       }
@@ -119,7 +121,7 @@ export const useDraggable = (widgetId: string) => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isDragging, dragOffset, widgetId, widget, widgets, updateWidget, sendWidget]);
+  }, [isDragging, dragOffset, widgetId, widget?.x, widget?.y, widget?.width, widget?.height, updateWidget, sendWidget]);
 
   return {
     isDragging,

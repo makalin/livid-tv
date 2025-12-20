@@ -9,10 +9,24 @@ export default function ConnectionStats() {
 
   useEffect(() => {
     if (!peerConnection || !showStats) return;
+    if (typeof window === 'undefined') return;
+
+    // Store peerConnection in a ref to avoid dependency issues
+    const pc = peerConnection;
+    
+    // Early return if connection is closed
+    if (pc.signalingState === 'closed') {
+      return;
+    }
 
     const interval = setInterval(async () => {
       try {
-        const stats = await peerConnection.getStats();
+        // Check if peerConnection is still valid
+        if (!pc || pc.signalingState === 'closed') {
+          clearInterval(interval);
+          return;
+        }
+        const stats = await pc.getStats();
         let bitrate = 0;
         let packetsLost = 0;
         let jitter = 0;
@@ -35,7 +49,8 @@ export default function ConnectionStats() {
           }
         });
 
-        setConnectionStats({
+        // Use getState to avoid dependency issues
+        useStore.getState().setConnectionStats({
           bitrate: Math.round(bitrate),
           packetsLost,
           jitter: Math.round(jitter * 1000), // ms
@@ -47,7 +62,7 @@ export default function ConnectionStats() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [peerConnection, showStats, setConnectionStats]);
+  }, [peerConnection, showStats]); // Removed setConnectionStats from dependencies
 
   const getQualityColor = (value: number, thresholds: { good: number; medium: number }) => {
     if (value >= thresholds.good) return 'text-green-400';

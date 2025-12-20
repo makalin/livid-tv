@@ -10,6 +10,10 @@ export const useScreenShare = () => {
   } = useStore();
 
   const startScreenShare = async () => {
+    if (typeof window === 'undefined' || !navigator.mediaDevices?.getDisplayMedia) {
+      return;
+    }
+    
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: { cursor: 'always' } as MediaTrackConstraints,

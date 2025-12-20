@@ -59,9 +59,14 @@ export default function ImageOverlay() {
   return (
     <>
       {/* Upload Button */}
-      <div className="absolute top-20 right-4 z-30" style={{ opacity: hudOpacity }}>
+      <div className="fixed top-20 right-4 z-30" style={{ opacity: hudOpacity }}>
         <button
-          onClick={() => fileInputRef.current?.click()}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
           className="glass-dark rounded-lg px-4 py-2 text-white text-sm hover:bg-white/20 transition-colors"
           title="Upload Image Overlay"
         >
@@ -94,12 +99,14 @@ export default function ImageOverlay() {
                   zIndex: isDragging ? 50 : 15,
                 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute cursor-move"
+                className="fixed cursor-move"
                 style={{
-                  left: widget.x,
-                  top: widget.y,
+                  position: 'fixed',
+                  left: `${widget.x}px`,
+                  top: `${widget.y}px`,
                   width: widget.width,
                   height: widget.height,
+                  zIndex: isDragging ? 50 : 25,
                 }}
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}

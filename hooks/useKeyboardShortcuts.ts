@@ -15,6 +15,9 @@ export const useKeyboardShortcuts = () => {
   } = useStore();
 
   useEffect(() => {
+    // Check if we're in browser environment
+    if (typeof window === 'undefined') return;
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger shortcuts when typing in input fields
       if (

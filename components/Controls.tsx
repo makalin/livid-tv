@@ -45,13 +45,19 @@ export default function Controls() {
   };
 
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex items-center gap-4">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex items-center gap-4" style={{ position: 'fixed' }}>
       {/* Chat Input */}
-      <form onSubmit={handleSendMessage} className="flex gap-2">
+      <form onSubmit={handleSendMessage} className="flex gap-2" onFocus={(e) => e.stopPropagation()}>
         <input
           type="text"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
+          onFocus={(e) => {
+            e.stopPropagation();
+            // Prevent scroll on focus
+            e.target.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+          }}
+          onClick={(e) => e.stopPropagation()}
           placeholder="Type a message..."
           className="glass-dark rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 min-w-[300px]"
           style={{ opacity: hudOpacity }}
@@ -68,7 +74,12 @@ export default function Controls() {
       {/* Control Buttons */}
       <div className="flex gap-2" style={{ opacity: hudOpacity }}>
         <button
-          onClick={toggleMute}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMute();
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             isMuted ? 'bg-red-500/50' : ''
           }`}
@@ -78,7 +89,12 @@ export default function Controls() {
         </button>
 
         <button
-          onClick={toggleVideo}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleVideo();
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             !isVideoEnabled ? 'bg-red-500/50' : ''
           }`}
@@ -88,7 +104,12 @@ export default function Controls() {
         </button>
 
         <button
-          onClick={clearStrokes}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clearStrokes();
+          }}
           className="glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors"
           title="Clear canvas"
         >
@@ -96,7 +117,12 @@ export default function Controls() {
         </button>
 
         <button
-          onClick={() => setShowDrawingTools(!showDrawingTools)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowDrawingTools(!showDrawingTools);
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             showDrawingTools ? 'bg-blue-500/50' : ''
           }`}
@@ -106,7 +132,16 @@ export default function Controls() {
         </button>
 
         <button
-          onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (isScreenSharing) {
+              stopScreenShare();
+            } else {
+              startScreenShare();
+            }
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             isScreenSharing ? 'bg-green-500/50' : ''
           }`}
@@ -116,7 +151,16 @@ export default function Controls() {
         </button>
 
         <button
-          onClick={isRecording ? stopRecording : startRecording}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (isRecording) {
+              stopRecording();
+            } else {
+              startRecording();
+            }
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             isRecording ? 'bg-red-500/50 animate-pulse' : ''
           }`}
@@ -128,7 +172,12 @@ export default function Controls() {
         <VirtualBackground />
 
         <button
-          onClick={() => setShowSettings(!showSettings)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowSettings(!showSettings);
+          }}
           className={`glass-dark rounded-lg p-3 text-white hover:bg-white/20 transition-colors ${
             showSettings ? 'bg-blue-500/50' : ''
           }`}

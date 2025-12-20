@@ -2,22 +2,37 @@ import { useEffect, useRef } from 'react';
 import { useStore } from '@/store/useStore';
 
 export const useReconnection = () => {
-  const { isConnected, setConnected, roomId } = useStore();
+  const { roomId } = useStore();
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
+  const setConnectedRef = useRef<((connected: boolean) => void) | null>(null);
+
+  // Update ref when store changes (only in browser)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setConnectedRef.current = useStore.getState().setConnected;
+    }
+  });
 
   useEffect(() => {
     if (!roomId) return;
+    
+    // Check if we're in browser environment
+    if (typeof window === 'undefined') return;
 
     const handleOnline = () => {
       console.log('Connection restored');
-      setConnected(true);
+      if (setConnectedRef.current) {
+        setConnectedRef.current(true);
+      }
       reconnectAttemptsRef.current = 0;
     };
 
     const handleOffline = () => {
       console.log('Connection lost');
-      setConnected(false);
+      if (setConnectedRef.current) {
+        setConnectedRef.current(false);
+      }
     };
 
     window.addEventListener('online', handleOnline);
@@ -25,7 +40,8 @@ export const useReconnection = () => {
 
     // Periodic connection check
     const checkInterval = setInterval(() => {
-      if (!isConnected && reconnectAttemptsRef.current < maxReconnectAttempts) {
+      const currentConnected = useStore.getState().isConnected;
+      if (!currentConnected && reconnectAttemptsRef.current < maxReconnectAttempts) {
         reconnectAttemptsRef.current += 1;
         console.log(`Reconnection attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}`);
         
@@ -41,6 +57,5 @@ export const useReconnection = () => {
       window.removeEventListener('offline', handleOffline);
       clearInterval(checkInterval);
     };
-  }, [isConnected, roomId, setConnected]);
+  }, [roomId]); // Removed isConnected and setConnected from dependencies
 };
-

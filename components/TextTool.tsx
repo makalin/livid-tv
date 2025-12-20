@@ -23,6 +23,9 @@ export default function TextTool() {
 
   useEffect(() => {
     if (drawingTool.type === 'text' && editingId === null) {
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') return;
+      
       // Text tool is active, wait for click to place text
       const handleCanvasClick = (e: MouseEvent) => {
         // Don't trigger if clicking on UI elements
@@ -76,7 +79,7 @@ export default function TextTool() {
       };
       addWidget(widget);
       sendWidget(widget);
-    } else {
+    } else if (editingId) {
       updateWidget(editingId, {
         content: textInput,
         fontColor: drawingTool.color,
@@ -123,6 +126,12 @@ export default function TextTool() {
               onChange={(e) => setTextInput(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSaveText}
+              onClick={(e) => e.stopPropagation()}
+              onFocus={(e) => {
+                e.stopPropagation();
+                // Prevent scroll on focus
+                e.target.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+              }}
               placeholder="Type text..."
               className="glass-dark rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 min-w-[200px]"
               style={{
@@ -164,14 +173,16 @@ export default function TextTool() {
                   zIndex: isDragging ? 50 : 15,
                 }}
                 exit={{ opacity: 0 }}
-                className="absolute cursor-move select-none"
+                className="fixed cursor-move select-none text-widget-draggable pointer-events-auto"
                 style={{
-                  left: widget.x,
-                  top: widget.y,
+                  position: 'fixed',
+                  left: `${widget.x}px`,
+                  top: `${widget.y}px`,
                   fontSize: `${widget.fontSize || 24}px`,
                   color: widget.fontColor || '#ffffff',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                   filter: isDragging ? 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))' : 'none',
+                  zIndex: isDragging ? 50 : 25,
                 }}
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}

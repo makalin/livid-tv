@@ -21,9 +21,14 @@ export default function FileShare() {
   };
 
   return (
-    <div className="absolute top-20 right-4 z-30" style={{ opacity: hudOpacity }}>
+    <div className="fixed top-32 right-4 z-30" style={{ opacity: hudOpacity }}>
       <button
-        onClick={() => fileInputRef.current?.click()}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fileInputRef.current?.click();
+        }}
         className="glass-dark rounded-lg px-4 py-2 text-white text-sm hover:bg-white/20 transition-colors mb-2"
         title="Share File"
       >

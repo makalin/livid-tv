@@ -13,6 +13,10 @@ export const useRecording = () => {
   const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = async () => {
+    if (typeof window === 'undefined' || typeof MediaRecorder === 'undefined') {
+      return;
+    }
+    
     try {
       if (!localStream && !remoteStream) {
         console.error('No streams available for recording');
