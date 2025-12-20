@@ -38,24 +38,22 @@ LiVid TV uses a lightweight signaling server to establish the connection, but th
 
 ```mermaid
 sequenceDiagram
-    participant UserA as 👤 User A
-    participant Signal as 📡 Signaling Server (Socket.io)
-    participant UserB as 👤 User B
+    participant UserA as User A
+    participant Signal as Signaling Server
+    participant UserB as User B
 
     Note over UserA,UserB: 1. Connection Establishment
-    UserA->>Signal: Join Room (ID: 123)
-    UserB->>Signal: Join Room (ID: 123)
+    UserA->>Signal: Join Room
+    UserB->>Signal: Join Room
     Signal->>UserA: Peer Found
-    UserA->>UserB: WebRTC Offer (SDP)
-    UserB->>UserA: WebRTC Answer (SDP)
+    UserA->>UserB: WebRTC Offer
+    UserB->>UserA: WebRTC Answer
     UserA->>UserB: ICE Candidates
 
-    Note over UserA,UserB: 2. P2P Established (No Server)
-    rect rgba(0, 255, 0, 0.1)
-        UserA<-->>UserB: Video Stream (RTP)
-        UserA<-->>UserB: Audio Stream (RTP)
-        UserA<-->>UserB: Data Channel (Drawing/Chat/Widgets)
-    end
+    Note over UserA,UserB: 2. P2P Established
+    UserA->>UserB: Video Stream
+    UserA->>UserB: Audio Stream
+    UserA->>UserB: Data Channel
 ```
 
 ## 🛠️ Tech Stack
