@@ -52,9 +52,9 @@ sequenceDiagram
 
     Note over UserA,UserB: 2. P2P Established (No Server)
     rect rgba(0, 255, 0, 0.1)
-        UserA<-->>UserB: 📹 Video Stream (RTP)
-        UserA<-->>UserB: 🔊 Audio Stream (RTP)
-        UserA<-->>UserB: ✏️ Data Channel (Drawing/Chat/Widgets)
+        UserA<-->>UserB: Video Stream (RTP)
+        UserA<-->>UserB: Audio Stream (RTP)
+        UserA<-->>UserB: Data Channel (Drawing/Chat/Widgets)
     end
 ```
 
